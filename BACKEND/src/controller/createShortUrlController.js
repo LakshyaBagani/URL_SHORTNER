@@ -14,15 +14,19 @@ export const createshortUrl = async (req, res) => {
         isUnique = true;
       }
     }
-    console.log("shortUrl to be saved:", shortUrl);
+    
+    const newURL = `http://localhost:3000/${shortUrl}`
 
     const newUrl = new urlSchema({
       full_urls: url,
       short_urls: shortUrl,
     });
 
+    console.log(newURL);
+    
+
     await newUrl.save();
-    res.status(200).send({ success: true, short_url: shortUrl });
+    res.status(200).send({ success: true, short_url: newURL });
   } catch (error) {
     res.status(500).send({ success: false, error: error.message });
   }
