@@ -3,9 +3,9 @@ import urlSchema from "../models/urlModel.js";
 export const redirectToShortUrl = async (req, res) => {
   const { short_url } = req.params;
   try {
-    const url = await urlSchema.findOne({ short_Url: short_url });
+    const url = await urlSchema.findOne({ short_urls: short_url });
     if (url) {
-      res.redirect(url.full_Url);
+      res.redirect(url.full_urls);
     } else {
       res.status(404).send("NOT FOUND");
     }
