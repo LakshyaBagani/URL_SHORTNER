@@ -4,6 +4,6 @@ const router = express.Router();
 
 router.post('/create', createshortUrl);
 router.get('/:shorturl' , redirectToShortUrl);
-router.get('/getallurls' , getAllUrls)
+router.post('/getallurls'  , getAllUrls)
 
 export default router;

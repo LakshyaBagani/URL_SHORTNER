@@ -46,5 +46,11 @@ export const redirectToShortUrl = async (req, res) => {
 
 
 export const getAllUrls = async (req,res)=>{
-  
+    const userId = req.user._id;
+    try {
+      const urls = await urlSchema.findOne({userId})
+      res.status(200).message({success:true , urls});
+    } catch (error) {
+      res.status(500).send({success:false , message:error.message})
+    }
 }
