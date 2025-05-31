@@ -43,3 +43,8 @@ export const redirectToShortUrl = async (req, res) => {
     res.status(404).send({ success: false, error: error.message });
   }
 };
+
+
+export const getAllUrls = async (req,res)=>{
+  
+}
