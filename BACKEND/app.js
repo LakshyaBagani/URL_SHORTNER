@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import connectToDB from './src/config/mongoConfig.js';
 import urlRoute from './src/routes/urlRoute.js'; 
 import authRoute from './src/routes/authRoute.js'
+import qrRoute from './src/routes/qrRoute.js'
 
 const app = express();
 app.use(express.json());
@@ -14,6 +15,7 @@ connectToDB();
 
 app.use('/url', urlRoute );
 app.use('/auth' , authRoute )
+app.use('/generateQR' , qrRoute )
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
