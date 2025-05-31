@@ -1,4 +1,5 @@
 import qrCode from "qrcode";
+import qrSchema from '../models/qrModel.js'
 
 export const generateQR = async (req, res) => {
   const { url } = req.body;
@@ -8,7 +9,11 @@ export const generateQR = async (req, res) => {
 
   try {
     const qr = await qrCode.toDataURL(url);
-    console.log("QR for the url is", qr);
+    const newQR = new qrSchema({
+      qrLink:qr,
+      url:url
+    })
+    await newQR.save();
     res.status(200).send({ success: true, message: "QR has been generated", qr});
   } catch (error) {
     res.status(500).send({ success: false, message: error.message });
