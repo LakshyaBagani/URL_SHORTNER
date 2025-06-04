@@ -18,11 +18,10 @@ function Login() {
         password,
       });
       console.log("Response", response.data);
+      localStorage.setItem("token", response.data.token);
       if(response.data.success == true){
         setLogin(true);
-        navigate('/')
-        const save = localStorage.setItem(email);
-        console.log("Save",save);
+        navigate('/');
       }
     } catch (error) {
       console.error("Login errorss:", error);
@@ -109,7 +108,7 @@ function Login() {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Don't have an account?{" "}
-            <button className="text-blue-600 hover:text-blue-700 font-medium transition-colors">
+            <button onClick={()=>{navigate('/register')}} className="text-blue-600 hover:text-blue-700 font-medium transition-colors">
               Sign up here
             </button>
           </p>

@@ -8,6 +8,7 @@ export const generateToken = (userId , res) =>{
 		sameSite: "strict", 
 		secure: false,
     })
+    return token;
 }
 
 export default generateToken;

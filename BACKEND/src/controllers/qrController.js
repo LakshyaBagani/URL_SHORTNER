@@ -1,5 +1,5 @@
 import qrCode from "qrcode";
-import qrSchema from '../models/qrModel.js'
+import urlSchema from "../models/urlModel.js";
 
 export const generateQR = async (req, res) => {
   const { url } = req.body;
@@ -9,11 +9,11 @@ export const generateQR = async (req, res) => {
 
   try {
     const qr = await qrCode.toDataURL(url);
-    const newQR = new qrSchema({
-      qrLink:qr,
-      url:url
-    })
-    await newQR.save();
+    const postUrl = await urlSchema.findOne({full_urls:url});
+    if(postUrl){
+      postUrl.qrLink = qr
+      await postUrl.save();
+    }
     res.status(200).send({ success: true, message: "QR has been generated", qr});
   } catch (error) {
     res.status(500).send({ success: false, message: error.message });

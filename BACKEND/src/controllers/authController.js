@@ -50,10 +50,10 @@ export const Login = async (req, res) => {
       return  res.status(404).send({ success: false, message: "Invalid credientials" });
     }
 
-    generateJwtToken(user._id, res);
+    const token = generateJwtToken(user._id, res);
     return res
       .status(200)
-      .send({ success: true, message: "User logged in successfully!" });
+      .send({ success: true, token:token , message: "User logged in successfully!" });
   } catch (error) {
     return res.status(500).send({ success: false, message: error.message });
   }

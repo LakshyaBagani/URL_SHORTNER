@@ -1,52 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Link,
   Copy,
   Trash2,
-  Edit3,
   BarChart3,
   Plus,
-  QrCode,
+  X,
 } from "lucide-react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+
 
 function Dashboard() {
   const [login, setLogin] = useState(false);
-  const [urls, setUrls] = useState([]);
-  const [newUrl, setNewUrl] = useState();
+  const [url, setUrls] = useState([]);
+  const [newUrl, setNewUrl] = useState("");
   const [customAlias, setCustomAlias] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [generateQR, setGenerateQR] = useState(false);
-  const navigate = useNavigate();
-
-  const handleLogin = () => {
-    navigate("/login");
-    setLogin(!login);
-  };
+  const [zoomedQR, setZoomedQR] = useState(null);
+  const navigate = useNavigate()
 
   useEffect(() => {
-    console.log("Triggered");
+    getAllUrls();
   }, []);
+
+  const handleLogin = () => {
+    if(login){
+      navigate("/login");
+      setLogin(!login);
+    }else{
+      axios.post('http://localhost:3000/auth/logout',{})
+      setLogin(!login)
+    }
+    
+  };
 
   const handleCreateUrl = async () => {
     try {
-      getAllUrls();
       const response = await axios.post("http://localhost:3000/url/create", {
         url: newUrl,
       });
 
       if (generateQR) {
-        const responses = await axios.post(
-          "http://localhost:3000/generateQR/qr",
-          { url: newUrl }
-        );
-        console.log("Resp", responses.data.qr);
+        await axios.post("http://localhost:3000/generateQR/qr", {
+          url: newUrl,
+        });
       }
-      console.log("Response", response.data.short_url);
+
+      // Refresh URLs after creation
+      getAllUrls();
+      setNewUrl("");
+      setCustomAlias("");
+      setShowCreateForm(false);
+      setGenerateQR(false);
     } catch (error) {
       console.log("Error", error);
+    }
+  };
+
+  const getAllUrls = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.log("No token found. User might not be logged in.");
+        return;
+      }
+      const response = await axios.get("http://localhost:3000/url/getallurls", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUrls(response.data.urls);
+    } catch (error) {
+      console.log("Error", error.message);
     }
   };
 
@@ -54,20 +81,19 @@ function Dashboard() {
     navigator.clipboard.writeText(text);
   };
 
-  const deleteUrl = (id) => {};
+  const deleteUrl = (id) => {
+  };
 
-  const getAllUrls = async () => {
-    try {
-      const resp = await axios.get("http://localhost:3000/url/getallurls");
-      console.log("Respo", resp.data);
-    } catch (error) {
-      console.log("Error", error.message);
-    }
+  const handleQRClick = (qrLink) => {
+    setZoomedQR(qrLink);
+  };
+
+  const closeQRModal = () => {
+    setZoomedQR(null);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
-      {/* Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-lg border-b border-blue-100">
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="flex justify-between items-center">
@@ -95,19 +121,16 @@ function Dashboard() {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Create New URL Section */}
+        {/* Create URL */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Create Short URL
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900">Create Short URL</h2>
             {!showCreateForm && (
               <button
                 onClick={() => setShowCreateForm(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 outline-none flex items-center space-x-2"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg"
               >
-                <Plus className="w-5 h-5" />
-                <span>New Link</span>
+                <Plus className="w-5 h-5 inline" /> New Link
               </button>
             )}
           </div>
@@ -115,29 +138,25 @@ function Dashboard() {
           {showCreateForm && (
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Original URL
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Original URL</label>
                 <input
                   type="url"
                   value={newUrl}
                   onChange={(e) => setNewUrl(e.target.value)}
-                  placeholder="https://example.com/your-long-url"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors placeholder-gray-400"
+                  placeholder="https://example.com"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Custom Alias (Optional)
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Custom Alias (Optional)</label>
                 <input
                   type="text"
                   value={customAlias}
                   onChange={(e) => setCustomAlias(e.target.value)}
                   placeholder="my-custom-link"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors placeholder-gray-400"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                 />
               </div>
 
@@ -147,22 +166,17 @@ function Dashboard() {
                     type="checkbox"
                     checked={generateQR}
                     onChange={(e) => setGenerateQR(e.target.checked)}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded"
                   />
-                  <span className="text-sm font-medium text-gray-700">
-                    Generate QR Code
-                  </span>
+                  <span className="text-sm font-medium text-gray-700">Generate QR Code</span>
                 </label>
-                <p className="text-xs text-gray-500 mt-1 ml-7">
-                  Check this if you want to generate a QR code for this URL
-                </p>
               </div>
 
               <div className="flex space-x-4">
                 <button
                   type="button"
                   onClick={handleCreateUrl}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 outline-none"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg"
                 >
                   Create Short URL
                 </button>
@@ -172,7 +186,7 @@ function Dashboard() {
                     setShowCreateForm(false);
                     setGenerateQR(false);
                   }}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-8 py-3 rounded-lg transition-colors duration-200"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-8 py-3 rounded-lg"
                 >
                   Cancel
                 </button>
@@ -181,85 +195,55 @@ function Dashboard() {
           )}
         </div>
 
-        {/* URLs List */}
+        {/* URLs Table */}
         <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-blue-100">
           <div className="p-10 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Your Links
-            </h2>
-            <p className="text-gray-600">
-              Manage and track your shortened URLs
-            </p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Your Links</h2>
+            <p className="text-gray-600">Manage and track your shortened URLs</p>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gradient-to-r from-gray-50 to-blue-50">
                 <tr>
-                  <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Original URL
-                  </th>
-                  <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Short URL
-                  </th>
-                  {urls.some((url) => url.hasQR) && (
-                    <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                      QR Code
-                    </th>
-                  )}
-                  <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Clicks
-                  </th>
-                  <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Created
-                  </th>
-                  <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase">Original URL</th>
+                  <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase">Short URL</th>
+                  <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase">QR Code</th>
+                  <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase">Clicks</th>
+                  <th className="px-10 py-6 text-left text-xs font-bold text-gray-600 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white/50 divide-y divide-gray-100">
-                {urls.map((url) => (
-                  <tr
-                    key={url.id}
-                    className="hover:bg-blue-50/50 transition-all duration-200"
-                  >
-                    <td className="px-10 py-8 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 max-w-xs truncate font-semibold">
-                        {url.originalUrl}
-                      </div>
+                {url.map((url) => (
+                  <tr key={url._id} className="hover:bg-blue-50/50 transition-all duration-200">
+                    <td className="px-10 py-8 whitespace-nowrap text-sm text-gray-900 font-semibold max-w-xs truncate">
+                      {url.full_urls}
                     </td>
                     <td className="px-10 py-8 whitespace-nowrap">
                       <div className="flex items-center space-x-4">
                         <span className="text-sm text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded-full">
-                          {url.shortUrl}
+                          {`http://localhost:3000/url/${url.short_urls}`}
                         </span>
                         <button
-                          onClick={() => copyToClipboard(url.shortUrl)}
-                          className="text-gray-400 hover:text-blue-600 transition-all duration-200 hover:scale-110 p-2 rounded-full hover:bg-blue-50"
+                          onClick={() => copyToClipboard(`http://localhost:3000/url/${url.short_urls}`)}
+                          className="text-gray-400 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50"
                         >
                           <Copy className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
-                    {urls.some((u) => u.hasQR) && (
-                      <td className="px-10 py-8 whitespace-nowrap">
-                        {url.hasQR ? (
-                          <div className="flex items-center justify-center">
-                            <div className="w-16 h-16 bg-white border-2 border-gray-200 rounded-lg flex items-center justify-center shadow-sm">
-                              {/* Replace this div with actual QR code component when you have the library */}
-                              <div className="text-center text-gray-400">
-                                <QrCode className="w-8 h-8 mx-auto" />
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-center text-gray-400 text-sm">
-                            No QR
-                          </div>
-                        )}
-                      </td>
-                    )}
+                    <td className="px-10 py-8 whitespace-nowrap text-center">
+                      {url.qrLink ? (
+                        <img
+                          src={url.qrLink}
+                          alt="QR"
+                          className="w-16 h-16 border border-gray-200 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200 hover:scale-105 transform"
+                          onClick={() => handleQRClick(url.qrLink)}
+                        />
+                      ) : (
+                        <span className="text-sm text-gray-400">No QR</span>
+                      )}
+                    </td>
                     <td className="px-10 py-8 whitespace-nowrap">
                       <div className="flex items-center space-x-3">
                         <div className="bg-green-100 p-2 rounded-full">
@@ -270,21 +254,13 @@ function Dashboard() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-10 py-8 whitespace-nowrap text-sm text-gray-600 font-medium">
-                      {url.createdAt}
-                    </td>
                     <td className="px-10 py-8 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-4">
-                        <button className="text-blue-600 hover:text-blue-700 transition-all duration-200 hover:scale-110 p-2 rounded-full hover:bg-blue-50">
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => deleteUrl(url.id)}
-                          className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-2 rounded-full hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => deleteUrl(url._id)}
+                        className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -293,6 +269,35 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* QR Code Modal */}
+      {zoomedQR && (
+        <div 
+          className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm"
+          onClick={closeQRModal}
+        >
+          <div className="relative bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
+            <button
+              onClick={closeQRModal}
+              className="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-lg transition-colors duration-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">QR Code</h3>
+              <img
+                src={zoomedQR}
+                alt="QR Code"
+                className="w-64 h-64 mx-auto border-2 border-gray-200 rounded-xl shadow-lg"
+                onClick={(e) => e.stopPropagation()}
+              />
+              <p className="text-sm text-gray-500 mt-4">
+                Scan this QR code to access the shortened URL
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

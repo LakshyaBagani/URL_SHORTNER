@@ -11,10 +11,15 @@ const shortUrlSchema = new mongoose.Schema({
     unique: true,
     index: true,
   },
+  qrLink:{
+    type:String,
+    default:""
+  },
   clicks: {
     type: Number,
     default: 0,
   },
+  
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

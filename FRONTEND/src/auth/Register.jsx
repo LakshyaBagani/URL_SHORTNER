@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import axios from 'axios'
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     try {
@@ -124,7 +126,7 @@ function Signup() {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Already have an account?{" "}
-            <button className="text-blue-600 hover:text-blue-700 font-medium transition-colors">
+            <button onClick={()=>{navigate('/login')}} className="text-blue-600 hover:text-blue-700 font-medium transition-colors">
               Sign in here
             </button>
           </p>
