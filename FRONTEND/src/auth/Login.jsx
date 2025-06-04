@@ -21,6 +21,8 @@ function Login() {
       if(response.data.success == true){
         setLogin(true);
         navigate('/')
+        const save = localStorage.setItem(email);
+        console.log("Save",save);
       }
     } catch (error) {
       console.error("Login errorss:", error);

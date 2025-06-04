@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Cookies from 'js-cookie';
 import {
   Link,
   Copy,
@@ -21,23 +20,19 @@ function Dashboard() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [generateQR, setGenerateQR] = useState(false);
   const navigate = useNavigate();
-  const userId = Cookies.get('jwt');
 
   const handleLogin = () => {
     navigate("/login");
-    setLogin(!login)
+    setLogin(!login);
   };
 
   useEffect(() => {
-    getAllUrls();
-    console.log(("Triggered"));
-    
-  }, [userId]);
+    console.log("Triggered");
+  }, []);
 
   const handleCreateUrl = async () => {
     try {
-      console.log("ID",userId);
-      
+      getAllUrls();
       const response = await axios.post("http://localhost:3000/url/create", {
         url: newUrl,
       });
@@ -63,12 +58,8 @@ function Dashboard() {
 
   const getAllUrls = async () => {
     try {
-      const resp = await axios.get(
-        "http://localhost:3000/url/getallurls",
-        {params:{userId}}
-      );
+      const resp = await axios.get("http://localhost:3000/url/getallurls");
       console.log("Respo", resp.data);
-      setUrls(resp.data);
     } catch (error) {
       console.log("Error", error.message);
     }
