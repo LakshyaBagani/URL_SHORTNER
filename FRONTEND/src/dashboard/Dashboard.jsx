@@ -38,7 +38,7 @@ function Dashboard() {
       navigate("/login");
       setLogin(true);
     }else{
-      axios.post('https://url-shortner-three-drab.vercel.app/auth/logout',{});
+      axios.post('https://url-shortner-kappa-lovat.vercel.app/auth/logout',{});
       localStorage.removeItem("token");
       setLogin(false);
     }
@@ -47,12 +47,12 @@ function Dashboard() {
 
   const handleCreateUrl = async () => {
     try {
-      const response = await axios.post("https://url-shortner-three-drab.vercel.app/url/create", {
+      const response = await axios.post("https://url-shortner-kappa-lovat.vercel.app/url/create", {
         url: newUrl,
       });
 
       if (generateQR) {
-        await axios.post("https://url-shortner-three-drab.vercel.app/generateQR/qr", {
+        await axios.post("https://url-shortner-kappa-lovat.vercel.app/generateQR/qr", {
           url: newUrl,
         });
       }
@@ -75,7 +75,7 @@ function Dashboard() {
         console.log("No token found. User might not be logged in.");
         return;
       }
-      const response = await axios.get("https://url-shortner-three-drab.vercel.app/url/getallurls", {
+      const response = await axios.get("https://url-shortner-kappa-lovat.vercel.app/url/getallurls", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
