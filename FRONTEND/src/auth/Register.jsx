@@ -12,7 +12,7 @@ function Signup() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("https://url-shortner-three-drab.vercel.app/auth/signup", {
+      const response = await axios.post("https://url-shortner-i149.vercel.app/auth/signup", {
         name,
         email,
         password,
