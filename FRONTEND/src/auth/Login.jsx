@@ -17,7 +17,6 @@ function Login() {
         email,
         password,
       });
-      console.log("Response", response.data);
       localStorage.setItem("token", response.data.token);
       if(response.data.success == true){
         setLogin(true);

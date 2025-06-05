@@ -17,7 +17,6 @@ function Signup() {
         email,
         password,
       });
-      console.log(response.data);
       console.log("Signup attempt with:", { name, email, password });
     } catch (error) {
       console.error("Signup error:", error);
