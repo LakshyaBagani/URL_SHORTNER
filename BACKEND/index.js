@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: "https://url-shortner-three-drab.vercel.app",
+    origin: "https://url-shortner-ghun.vercel.app/",
     credentials: true,
   })
 );
