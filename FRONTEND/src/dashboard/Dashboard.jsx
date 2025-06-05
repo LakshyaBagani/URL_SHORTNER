@@ -21,29 +21,38 @@ function Dashboard() {
   const [zoomedQR, setZoomedQR] = useState(null);
   const navigate = useNavigate()
 
+
+
   useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    setLogin(true);
     getAllUrls();
-  }, []);
+  } else {
+    setLogin(false);
+  }
+}, []);
 
   const handleLogin = () => {
-    if(login){
+    if(!login){
       navigate("/login");
-      setLogin(!login);
+      setLogin(true);
     }else{
-      axios.post('http://localhost:3000/auth/logout',{})
-      setLogin(!login)
+      axios.post('https://url-shortner-three-drab.vercel.app/auth/logout',{});
+      localStorage.removeItem("token");
+      setLogin(false);
     }
-    
+    window.location.reload(); 
   };
 
   const handleCreateUrl = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/url/create", {
+      const response = await axios.post("https://url-shortner-three-drab.vercel.app/url/create", {
         url: newUrl,
       });
 
       if (generateQR) {
-        await axios.post("http://localhost:3000/generateQR/qr", {
+        await axios.post("https://url-shortner-three-drab.vercel.app/generateQR/qr", {
           url: newUrl,
         });
       }
@@ -66,7 +75,7 @@ function Dashboard() {
         console.log("No token found. User might not be logged in.");
         return;
       }
-      const response = await axios.get("http://localhost:3000/url/getallurls", {
+      const response = await axios.get("https://url-shortner-three-drab.vercel.app/url/getallurls", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -114,7 +123,7 @@ function Dashboard() {
               onClick={handleLogin}
               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl focus:ring-4 focus:ring-red-200 outline-none"
             >
-              {login ? "Login" : "Logout"}
+              {!login ? "Login" : "Logout"}
             </button>
           </div>
         </div>
@@ -222,10 +231,10 @@ function Dashboard() {
                     <td className="px-10 py-8 whitespace-nowrap">
                       <div className="flex items-center space-x-4">
                         <span className="text-sm text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded-full">
-                          {`http://localhost:3000/url/${url.short_urls}`}
+                          {`https://url-shortner-three-drab.vercel.app/url/${url.short_urls}`}
                         </span>
                         <button
-                          onClick={() => copyToClipboard(`http://localhost:3000/url/${url.short_urls}`)}
+                          onClick={() => copyToClipboard(`https://url-shortner-three-drab.vercel.app/url/${url.short_urls}`)}
                           className="text-gray-400 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50"
                         >
                           <Copy className="w-4 h-4" />
@@ -237,7 +246,7 @@ function Dashboard() {
                         <img
                           src={url.qrLink}
                           alt="QR"
-                          className="w-16 h-16 border border-gray-200 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200 hover:scale-105 transform"
+                          className="w-100 h-10 border border-gray-200 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200 hover:scale-105 transform"
                           onClick={() => handleQRClick(url.qrLink)}
                         />
                       ) : (
