@@ -13,7 +13,7 @@ function Login() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("https://url-shortner-kappa-lovat.vercel.app/auth/login", {
+      const response = await axios.post("http://localhost:3000/auth/login", {
         email,
         password,
       });
