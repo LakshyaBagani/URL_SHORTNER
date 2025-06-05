@@ -35,6 +35,7 @@ function Dashboard() {
 
   const handleLogin = () => {
     if(!login){
+      console.log('/login')
       navigate("/login");
       setLogin(true);
     }else{
