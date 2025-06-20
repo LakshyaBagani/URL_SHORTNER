@@ -231,10 +231,10 @@ function Dashboard() {
                     <td className="px-10 py-8 whitespace-nowrap">
                       <div className="flex items-center space-x-4">
                         <span className="text-sm text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded-full">
-                          {`https://url-shortner-three-drab.vercel.app/url/${url.short_urls}`}
+                          {`https://url-shortner-theta-indol.vercel.app/${url.short_urls}`}
                         </span>
                         <button
-                          onClick={() => copyToClipboard(`https://url-shortner-three-drab.vercel.app/url/${url.short_urls}`)}
+                          onClick={() => copyToClipboard(`https://url-shortner-theta-indol.vercel.app/${url.short_urls}`)}
                           className="text-gray-400 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50"
                         >
                           <Copy className="w-4 h-4" />
