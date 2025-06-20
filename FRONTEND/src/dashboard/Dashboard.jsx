@@ -231,10 +231,10 @@ function Dashboard() {
                     <td className="px-10 py-8 whitespace-nowrap">
                       <div className="flex items-center space-x-4">
                         <span className="text-sm text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded-full">
-                          {`http://localhost:5173/${url.short_urls}`}
+                          {`http://localhost:3000/url/${url.short_urls}`}
                         </span>
                         <button
-                          onClick={() => copyToClipboard(`http://localhost:5173/${url.short_urls}`)}
+                          onClick={() => copyToClipboard(`http://localhost:3000/url/${url.short_urls}`)}
                           className="text-gray-400 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50"
                         >
                           <Copy className="w-4 h-4" />
